@@ -7,7 +7,7 @@ from collections import *
 #reload(sys)
 #sys.setdefaultencoding('utf8')
 
-fileHindi = 'idwiki-20170801-pages-meta-current.xml'
+fileHindi = 'hiwiki-20170801-pages-meta-current.xml'
 
 def strip_tag_name(t):
     t = elem.tag
@@ -23,39 +23,40 @@ wordFrequency = defaultdict(int)
 
 for event, elem in etree.iterparse(fileHindi, events=('start', 'end')):
     tname = strip_tag_name(elem.tag)
-    co += 1
-    if co > 100000:
-        break
+    # co += 1
+    # if co > 5000:
+    #     break
     if tname == 'text':
         title = elem.text
         try :
-            #title.decode("utf-8")
-            #title=title.encode("ascii","ignore")
-            title = re.split("[^A-Za-z]+", title)
-            #title = title.split()
-            #flag = defaultdict(bool)
+            title = re.split(r"[\x00-\x7f]+", title)
+            # flag = defaultdict(bool)
             for t in title:
                 if t :
                     wordFrequency[t] += 1
+            #         if not flag[t] :
+            #             flag[t] = True
+            #             wordPageCount[t] += 1
+            # flag.clear()
         except :
             pass
 
     elem.clear()
 #print co
 #elapsed_time = time.time() - start_time
-print(len(wordFrequency))
+#print(len(wordFrequency))
 s = Counter(wordFrequency)
 co = 0
-topWordsNumber = 50
-maxLen = 7
+topWordsNumber = 100
+maxLen = 4
 # for word in wordPageCount:
 #     wordPageCount[word] *= wordFrequency[word]
 for k,v in s.most_common(100):
-    #if(len(k)<maxLen):
-    print(k)
-    #    co += 1
-    # if co==topWordsNumber:
-    #     break
+    if(len(k)<=maxLen):
+        print(k)
+        co += 1
+    if co==topWordsNumber:
+        break
 # s = Counter(wordPageCount)
 # print("2nd one :")
 # for k,v in s.most_common(50):
